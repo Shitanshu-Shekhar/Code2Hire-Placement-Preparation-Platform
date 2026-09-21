@@ -101,12 +101,19 @@ app.get('/api/health', (req, res) => {
 })
 
 // Real-time LeetCode Profile GraphQL Scraper
-app.get('/api/leetcode/:query*', async (req, res) => {
-  const rawQuery = req.params.query || req.params[0] || req.url.replace(/^\/api\/leetcode\/?/, '')
-  const username = extractLeetCodeUsername(rawQuery)
+
+app.get('/api/leetcode/*query', async (req, res) => {
+
+  const rawQuery = Array.isArray(req.params.query)
+    ? req.params.query.join('/')
+    : req.params.query || '';
+
+  const username = extractLeetCodeUsername(rawQuery);
 
   if (!username) {
-    return res.status(400).json({ error: 'Valid LeetCode username or profile link is required.' })
+    return res.status(400).json({
+      error: 'Valid LeetCode username or profile link is required.'
+    });
   }
 
   const query = {
